@@ -1,0 +1,40 @@
+# k8s-for-devs
+
+replace openjdk with amazoncorretto
+
+docker build -t resources-image:v2 ./resources-service
+docker build -t songs-image:v2 ./songs-service
+
+--- from the folder contains k8s yaml files:
+kubectl apply -f .
+kubectl apply -f 0-namespace.yaml
+kubectl get all -n=k8s-program
+kubectl port-forward -n k8s-program pod/resources-db-0 5433:5432
+kubectl port-forward -n k8s-program pod/songs-db-0 5434:5432
+kubectl delete -f .
+
+kubectl describe pod resources-db-0 -n k8s-program
+kubectl get storageclass -n k8s-program
+
+kubectl pod -o wide
+kubectl endpoints
+kubectl get sc
+
+kubectl describe service <service-name>
+kubectl describe pod -o wide
+
+kubectl get pv resource-db-pv
+
+kubectl get pv -n k8s-program
+kubectl get pvc -n k8s-program
+
+kubectl logs resources-db-0 -n k8s-program
+
+kubectl get pods -n k8s-program
+kubectl exec songs-ms-78b67c5844-4wskb -n k8s-program -- sh -c "echo 'This file persists' > /app/data/test.txt"
+kubectl exec songs-ms-78b67c5844-4wskb -n k8s-program -- cat /app/data/test.txt
+kubectl delete pod songs-ms-78b67c5844-4wskb -n k8s-program
+kubectl get pods -n k8s-program
+kubectl exec songs-ms-78b67c5844-lfb89 -n k8s-program -- cat /app/data/test.txt
+
+kubectl apply --dry-run (best for K8s validation)

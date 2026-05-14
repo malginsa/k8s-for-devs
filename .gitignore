@@ -1,0 +1,25 @@
+# Gradle operational files
+.gradle/
+build/
+# Avoid ignoring Gradle wrapper jar file (essential for building without local Gradle installation)
+!gradle-wrapper.jar
+
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
+.vscode/
+
+.mvn/
+mvnw
+mvnw.cmd
+
+target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+

@@ -1,0 +1,52 @@
+# Resources Microservice Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: resources-ms
+  namespace: k8s-program
+spec:
+  type: NodePort # external traffic has access to 8081 on each worker node
+  ports:
+    - port: 8080 # the "outside" port for incoming requests, mapped to the targetPort of pod
+      targetPort: 8080 # the port ot apps container is listening at (matches containerPort in Deployment)
+      nodePort: 30080 # Custom port for node testing
+  selector:
+    app: resources-ms
+---
+# Resources Microservice Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: resources-ms
+  namespace: k8s-program
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: resources-ms
+  template:
+    metadata:
+      labels:
+        app: resources-ms
+    spec:
+      containers:
+        - name: resources-ms
+          image: resources-image:v2
+          imagePullPolicy: IfNotPresent # to look the image at the local Docker daemon
+          ports:
+            - containerPort: 8080 # the port of the app that is running in the container
+          env:
+            - name: RESOURCES_DB_URL
+              value: "resources-db" # Points to the ClusterIP service
+            - name: RESOURCES_DB_PORT
+              value: "5432"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "postgres"
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: "password"
+            - name: SONGS_MS_URL
+              value: "songs-ms"
+            - name: SONGS_MS_PORT
+              value: "8081"
+            - name: RESOURCES_MS_PORT
+              value: "8080"

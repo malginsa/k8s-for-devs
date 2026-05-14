@@ -1,0 +1,62 @@
+# postgres --------------------------------------------------------------------
+services:
+  resources-ms:
+    image: resources-image
+    build:
+      context: resources-service
+    ports:
+      - 8080:8080
+    restart: always
+    environment:
+      RESOURCES_DB_URL: resources-db
+    depends_on:
+      - resources-db
+      - songs-ms
+      - eureka-server
+
+  songs-ms:
+    image: songs-image
+    build:
+      context: songs-service
+    ports:
+      - 8081:8081
+    restart: always
+    environment:
+      SONGS_DB_URL: songs-db
+    depends_on:
+      # shows that that container (app) depends on db container
+      - songs-db
+      - eureka-server
+  songs-db:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    restart: always
+  resources-db:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+    env_file:
+      - .env
+    restart: always
+
+  # eureka server --------------------------------------------------------------------
+  eureka-server:
+    image: eureka-server-image
+    build:
+      context: eureka
+    ports:
+      - 8761:8761
+    restart: always
+
+# volumes --------------------------------------------------------------------
+volumes:
+  # declaration of the volume which might be needed
+  db-data:
+  pg-admin:

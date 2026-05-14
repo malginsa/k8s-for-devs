@@ -1,0 +1,54 @@
+# Resources Database Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: resources-db
+  namespace: k8s-program
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: resources-db
+  type: ClusterIP # Restricts external access
+---
+# Resources Database StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: resources-db
+  namespace: k8s-program
+spec:
+  serviceName: "resources-db"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: resources-db
+  template:
+    metadata:
+      labels:
+        app: resources-db
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: "resources_db"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              value: "password" # Use standard DB env variables
+          volumeMounts:
+            - name: db-data
+              mountPath: /var/lib/postgresql
+  volumeClaimTemplates:
+    - metadata:
+        name: db-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 1Gi

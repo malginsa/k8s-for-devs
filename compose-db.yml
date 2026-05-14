@@ -1,0 +1,30 @@
+# postgres --------------------------------------------------------------------
+services:
+  db:
+    image: postgres
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    restart: always
+
+  # postgres pgAdmin --------------------------------------------------------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    volumes:
+      - pg-admin:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=stky20@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=postgres
+    ports:
+      - 5050:80
+    restart: always
+    depends_on: # shows that that container (app) depends on db container
+      - db
+
+# volumes --------------------------------------------------------------------
+volumes:        # declaration of the volume which might be needed
+  db-data:
+  pg-admin:

@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: songs-manual-pv
+spec:
+  capacity:
+    storage: 2Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: "/data/songs-app" # Path on the node's local disk
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: songs-app-pvc
+  namespace: k8s-program
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: manual
+#  volumeName: songs-manual-pv
