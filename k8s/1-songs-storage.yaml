@@ -20,7 +20,7 @@ metadata:
   namespace: k8s-program
 spec:
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
