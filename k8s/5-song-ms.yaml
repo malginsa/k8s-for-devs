@@ -46,6 +46,8 @@ spec:
               value: "password"
             - name: SONGS_MS_PORT
               value: "8081"
+            - name: DATABASE_NAME
+              value: "songs_db"
           volumeMounts:
             - name: songs-local-storage
               mountPath: /app/data # Directory inside PV?

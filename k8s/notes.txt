@@ -30,6 +30,7 @@ kubectl get pvc -n k8s-program
 
 kubectl logs resources-db-0 -n k8s-program
 
+# check persistence of file on hostPath
 kubectl get pods -n k8s-program
 kubectl exec songs-ms-78b67c5844-4wskb -n k8s-program -- sh -c "echo 'This file persists' > /app/data/test.txt"
 kubectl exec songs-ms-78b67c5844-4wskb -n k8s-program -- cat /app/data/test.txt
@@ -38,3 +39,13 @@ kubectl get pods -n k8s-program
 kubectl exec songs-ms-78b67c5844-lfb89 -n k8s-program -- cat /app/data/test.txt
 
 kubectl apply --dry-run (best for K8s validation)
+
+# Validate YAML syntax
+kubectl apply --dry-run=client -f k8s/
+
+# Check base64 encoding
+echo -n 'postgres' | base64
+echo -n 'cG9zdGdyZXM=' | base64 -d  # Verify decode
+
+# Validate Secret creation
+kubectl create secret generic test-secret --from-literal=key=value --dry-run=client -o yaml

@@ -50,3 +50,5 @@ spec:
               value: "8081"
             - name: RESOURCES_MS_PORT
               value: "8080"
+            - name: DATABASE_NAME
+              value: "resources_db"
