@@ -1,0 +1,2 @@
+No need to create db tables from Services: spring.jpa.hibernate.ddl-auto = create-drop
+3.4 Step from tasks/module-2/sub-task-2/plan.md

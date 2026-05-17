@@ -2,8 +2,13 @@
 
 replace openjdk with amazoncorretto
 
-docker build -t resources-image:v2 ./resources-service
-docker build -t songs-image:v2 ./songs-service
+gradlew clean build -x test  # rebuild all jars
+gradlew :resources-service:build
+gradlew :songs-service:build
+docker build -t resources-image:v3 ./resources-service
+docker build -t songs-image:v3 ./songs-service
+docker image ls resources-image:v3
+docker image ls songs-image:v3
 
 --- from the folder contains k8s yaml files:
 kubectl apply -f .
@@ -11,7 +16,7 @@ kubectl apply -f 0-namespace.yaml
 kubectl get all -n=k8s-program
 kubectl port-forward -n k8s-program pod/resources-db-0 5433:5432
 kubectl port-forward -n k8s-program pod/songs-db-0 5434:5432
-kubectl delete -f .
+kubectl delete --ignore-not-found=true -f k8s/
 
 kubectl describe pod resources-db-0 -n k8s-program
 kubectl get storageclass -n k8s-program

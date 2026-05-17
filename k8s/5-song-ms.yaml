@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: songs-ms
-          image: songs-image:v2
+          image: songs-image:v3
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081 # the port of the app that is running in the container
@@ -49,6 +49,27 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: postgres-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
           volumeMounts:
             - name: songs-local-storage
               mountPath: /app/data # Directory inside PV?

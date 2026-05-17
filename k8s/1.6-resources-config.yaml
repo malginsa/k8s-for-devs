@@ -6,6 +6,7 @@ metadata:
 data:
   RESOURCES_DB_URL: "resources-db"
   RESOURCES_DB_PORT: "5432"
+  DATABASE_NAME: "resources_db"
   SONGS_MS_URL: "songs-ms"
   SONGS_MS_PORT: "8081"
   RESOURCES_MS_PORT: "8080"

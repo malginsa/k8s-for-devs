@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: resources-ms
-          image: resources-image:v2
+          image: resources-image:v3
           imagePullPolicy: IfNotPresent # to look the image at the local Docker daemon
           ports:
             - containerPort: 8080 # the port of the app that is running in the container
@@ -49,3 +49,24 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: postgres-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
