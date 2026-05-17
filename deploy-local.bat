@@ -18,7 +18,7 @@ echo.
 
 REM Delete all running resources
 echo Step 2: Deleting running resources...
-kubectl delete -f k8s/
+kubectl delete --ignore-not-found=true -f k8s/
 if errorlevel 1 (
     echo [ERROR] Failed to delete resources
     exit /b 1
@@ -38,7 +38,7 @@ echo.
 
 REM Perform end-to-end tests
 echo Step 7: Running local deployment checks...
-python e2e-tests.py
+python local-deployment-check.py
 if errorlevel 1 (
     echo [ERROR] local deployment checks failed
     exit /b 1
