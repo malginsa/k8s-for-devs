@@ -49,3 +49,6 @@ echo -n 'cG9zdGdyZXM=' | base64 -d  # Verify decode
 
 # Validate Secret creation
 kubectl create secret generic test-secret --from-literal=key=value --dry-run=client -o yaml
+
+--- to run bash
+wsl -d Ubuntu

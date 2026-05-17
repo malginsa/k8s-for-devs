@@ -18,3 +18,4 @@ Read `docs/api-endpoints.md` for API endpoints
 Read `docs/common-development-patterns.md` for Common Development Patterns
 Read `docs/build-commands.md` for Build Commands
 Read `docs/running-with-docker-compose.md` for Running with Docker Compose
+Read `docs/terminology.md` for terminology

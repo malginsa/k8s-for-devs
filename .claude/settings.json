@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl *)",
+      "Bash(docker *)",
+      "Bash(mvn *)",
+      "Bash(./mvnw *)"
+    ]
+  }
+}

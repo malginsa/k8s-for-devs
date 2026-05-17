@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(kubectl version *)",
+      "Bash(kubectl cluster-info *)",
+      "Bash(./gradlew clean *)",
+      "Bash(curl -f http://localhost:30080/actuator/health)",
+      "Bash(curl -f http://localhost:30081/actuator/health)",
+      "Bash(curl -s http://localhost:30080/actuator/health)",
+      "Bash(curl -s http://localhost:30081/songs)"
+    ]
+  }
+}
