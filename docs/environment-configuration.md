@@ -26,6 +26,7 @@ Loaded into `resources-ms` via `envFrom`:
 
 - `RESOURCES_DB_URL`: `resources-db`
 - `RESOURCES_DB_PORT`: `5432`
+- `DATABASE_NAME`: `resources_db` — must match `database-config.POSTGRES_DB_RESOURCES`; consumed by `application.properties` as `${DATABASE_NAME}` in the JDBC URL
 - `RESOURCES_MS_PORT`: `8080`
 - `SONGS_MS_URL`: `songs-ms`
 - `SONGS_MS_PORT`: `8081`
@@ -36,6 +37,7 @@ Loaded into `songs-ms` via `envFrom`:
 
 - `SONGS_DB_URL`: `songs-db`
 - `SONGS_DB_PORT`: `5432`
+- `DATABASE_NAME`: `songs_db` — must match `database-config.POSTGRES_DB_SONGS`; consumed by `application.properties` as `${DATABASE_NAME}` in the JDBC URL
 - `SONGS_MS_PORT`: `8081`
 
 #### Database init ConfigMaps
