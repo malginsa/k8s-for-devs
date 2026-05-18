@@ -29,6 +29,35 @@ All four workloads declare `startupProbe`, `livenessProbe`, and `readinessProbe`
   - `startupProbe` → `tcpSocket` on `5432` (succeeds the moment Postgres opens its listener)
   - `livenessProbe` / `readinessProbe` → `exec pg_isready -U postgres -d <db> -h 127.0.0.1`
 
-Deploy with: `kubectl apply -f k8s/`
+### Deployment Commands
+
+**Deploy all resources**:
+```bash
+kubectl apply -f k8s/
+```
 
 The `kubectl apply -f <directory>` command applies manifests in lexicographic filename order, which is why the prerequisite resources use lower numeric prefixes (`0-`, `1.1-`, `1.5-` … `1.9.2-`) before the workloads (`2-` through `5-`).
+
+**Verify deployment**:
+```bash
+# Check all resources
+kubectl get all -n k8s-program
+
+# Watch pods starting up
+kubectl get pods -n k8s-program -w
+
+# Check services
+kubectl get svc -n k8s-program
+```
+
+### Rancher Desktop Configuration
+
+This project uses **Rancher Desktop** for local Kubernetes:
+
+- **Kubernetes Distribution**: K3s (lightweight Kubernetes)
+- **Container Runtime**: containerd
+- **Image Management**: Docker images built locally are automatically available to Kubernetes
+- **Service Access**: NodePort services accessible on `localhost` (30080, 30081)
+- **Context Name**: `rancher-desktop`
+
+**Image Pull Policy**: Manifests use `imagePullPolicy: IfNotPresent` to prioritize local images over remote registries. This allows development without pushing to Docker Hub.

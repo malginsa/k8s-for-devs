@@ -21,6 +21,11 @@ metadata:
   namespace: k8s-program
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: songs-ms # the pod name to deploy, that described below
@@ -31,7 +36,7 @@ spec:
     spec:
       containers:
         - name: songs-ms
-          image: songs-image:v3
+          image: songs-image:v4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081 # the port of the app that is running in the container

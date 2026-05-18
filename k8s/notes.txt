@@ -5,8 +5,8 @@ replace openjdk with amazoncorretto
 gradlew clean build -x test  # rebuild all jars
 gradlew :resources-service:build
 gradlew :songs-service:build
-docker build -t resources-image:v3 ./resources-service
-docker build -t songs-image:v3 ./songs-service
+docker build -t resources-image:v4 ./resources-service
+docker build -t songs-image:v4 ./songs-service
 docker image ls resources-image:v3
 docker image ls songs-image:v3
 
@@ -34,6 +34,7 @@ kubectl get pv -n k8s-program
 kubectl get pvc -n k8s-program
 
 kubectl logs resources-db-0 -n k8s-program
+kubectl logs -n k8s-program -l app=songs-ms --tail=500
 
 # check persistence of file on hostPath
 kubectl get pods -n k8s-program

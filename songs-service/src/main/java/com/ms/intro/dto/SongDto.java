@@ -26,4 +26,6 @@ public class SongDto {
     Integer resourceId;
 
     String year;
+
+    String genre;
 }

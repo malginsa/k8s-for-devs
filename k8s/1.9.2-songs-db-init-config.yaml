@@ -16,7 +16,8 @@ data:
         album VARCHAR(255),
         length VARCHAR(50),
         resource_id INTEGER UNIQUE NOT NULL,
-        year VARCHAR(10)
+        year VARCHAR(10),
+        genre VARCHAR(255)
     );
 
     -- Indexes for common queries
