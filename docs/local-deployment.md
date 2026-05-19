@@ -60,17 +60,33 @@ The manifests use `hostPath` PersistentVolumes pointing to `/data/songs-app`. In
 
 # 2. Build Docker images
 cd resources-service
-docker build -t resources-image:v2 .
+docker build -t resources-image:v3 .
 cd ../songs-service
-docker build -t songs-image:v3 .
+docker build -t songs-image:v4 .
 cd ..
 
-# 3. Deploy to Kubernetes
+# 3. Deploy to Kubernetes (choose one method)
+
+# Option A: Using Helm (Recommended)
+helm install microservices-app k8s-helm-chart
+
+# Option B: Using kubectl
 kubectl apply -f k8s/
 
 # 4. Verify deployment
 kubectl get all -n k8s-program
 kubectl get pods -n k8s-program -w
+```
+
+**Deploy with Custom Configuration** (Helm only):
+```bash
+# Deploy to different namespace with more replicas
+helm install microservices-app k8s-helm-chart \
+  --set namespace=k8s-program-test \
+  --set replicaCount=3
+
+# Verify custom deployment
+kubectl get all -n k8s-program-test
 ```
 
 ### Troubleshooting
