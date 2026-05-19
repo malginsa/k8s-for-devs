@@ -1,0 +1,84 @@
+# Songs Microservice Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: songs-ms
+  namespace: {{ .Values.namespace }}
+spec:
+  type: NodePort # external traffic has access to 8081 on each worker node
+  ports:
+    - port: 8081 # the "outside" port for incoming requests, mapped to the targetPort of pod
+      targetPort: 8081 # the port ot apps container is listening at (matches containerPort in Deployment)
+      nodePort: 30081 # node port is accessible through it (any of 30000-32767)
+  selector:
+    app: songs-ms # this service is running only for this pod name
+---
+# Songs Microservice Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: songs-ms
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: songs-ms # the pod name to deploy, that described below
+  template: # pod configuration inside deployment
+    metadata:
+      labels:
+        app: songs-ms # name of the pod
+    spec:
+      containers:
+        - name: songs-ms
+          image: songs-image:v4
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081 # the port of the app that is running in the container
+          envFrom:
+            - configMapRef:
+                name: songs-ms-config
+          env:
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          volumeMounts:
+            - name: songs-local-storage
+              mountPath: /app/data # Directory inside PV?
+      volumes:
+        - name: songs-local-storage
+          persistentVolumeClaim:
+            claimName: songs-app-pvc
