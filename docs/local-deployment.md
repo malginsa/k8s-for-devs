@@ -29,7 +29,9 @@ cd songs-service
 docker build -t songs-image:v3 .
 
 # Image is automatically available to Kubernetes
-kubectl apply -f ../k8s/5-song-ms.yaml
+# Deploy using Helm from project root
+cd ..
+helm upgrade microservices-app k8s-helm-chart --install
 ```
 
 ### Accessing Services
@@ -65,13 +67,8 @@ cd ../songs-service
 docker build -t songs-image:v4 .
 cd ..
 
-# 3. Deploy to Kubernetes (choose one method)
-
-# Option A: Using Helm (Recommended)
+# 3. Deploy to Kubernetes
 helm install microservices-app k8s-helm-chart
-
-# Option B: Using kubectl
-kubectl apply -f k8s/
 
 # 4. Verify deployment
 kubectl get all -n k8s-program

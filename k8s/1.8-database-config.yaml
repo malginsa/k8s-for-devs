@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: database-config
-  namespace: k8s-program
-data:
-  POSTGRES_DB_RESOURCES: "resources_db"
-  POSTGRES_DB_SONGS: "songs_db"

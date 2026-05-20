@@ -7,7 +7,7 @@ In the Kubernetes deployment both PostgreSQL instances run in-cluster as `Statef
 
 Database names come from the `database-config` ConfigMap (`POSTGRES_DB_RESOURCES`, `POSTGRES_DB_SONGS`) and are mirrored into each microservice's ConfigMap as `DATABASE_NAME` so the application's JDBC URL resolves to the same name. Credentials come from the shared `db-credentials` Secret.
 
-Schemas are seeded by the init-script ConfigMaps (`k8s/1.9.1-resources-db-init-config.yaml`, `k8s/1.9.2-songs-db-init-config.yaml`) mounted into `/docker-entrypoint-initdb.d`. These run only once per fresh PVC — if you need to re-init, delete the PVC.
+Schemas are seeded by the init-script ConfigMaps (`k8s-helm-chart/templates/1.9.1-resources-db-init-config.yaml`, `k8s-helm-chart/templates/1.9.2-songs-db-init-config.yaml`) mounted into `/docker-entrypoint-initdb.d`. These run only once per fresh PVC — if you need to re-init, delete the PVC.
 
 The microservices still use `spring.jpa.hibernate.ddl-auto=create-drop`; over time the SQL init scripts should become the schema source of truth and Hibernate switched to `validate` (see `tasks/module-2/sub-task-1/plan.md`). Separate databases maintain service independence.
 

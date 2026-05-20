@@ -1,12 +1,16 @@
 ## Kubernetes Deployment
 
-The project supports two deployment approaches:
-1. **Direct kubectl deployment** using manifests in `k8s/` directory
-2. **Helm chart deployment** using the chart in `k8s-helm-chart/` directory (recommended)
+The project uses **Helm** for Kubernetes deployments, providing:
+- Template-based configurations
+- Values-driven customization  
+- Version management
+- Easy upgrades and rollbacks
 
-### Manifest Structure
+See `k8s-helm-chart/` for Helm chart structure.
 
-The `k8s/` directory contains Kubernetes manifests numbered for deployment order. Lower-numbered prerequisites (namespace, storage, secrets, config) are applied before the workloads that depend on them.
+### Resource Structure
+
+The Helm chart deploys the following Kubernetes resources (numbered for deployment order):
 
 1. `0-namespace.yaml`: `Namespace` definition (`k8s-program`) — every other resource lives in this namespace
 2. `1.1-songs-storage.yaml`: `PersistentVolume` + `PersistentVolumeClaim` for songs application storage (mounted into `songs-ms` at `/app/data`)
@@ -36,8 +40,6 @@ All four workloads declare `startupProbe`, `livenessProbe`, and `readinessProbe`
   - `livenessProbe` / `readinessProbe` → `exec pg_isready -U postgres -d <db> -h 127.0.0.1`
 
 ### Deployment Commands
-
-#### Option 1: Helm Deployment (Recommended)
 
 **Deploy with default values** (namespace: `k8s-program`, replicas: `2`):
 ```bash
@@ -77,16 +79,7 @@ helm uninstall microservices-app
 helm get values microservices-app
 ```
 
-#### Option 2: Direct kubectl Deployment
-
-**Deploy all resources**:
-```bash
-kubectl apply -f k8s/
-```
-
-The `kubectl apply -f <directory>` command applies manifests in lexicographic filename order, which is why the prerequisite resources use lower numeric prefixes (`0-`, `1.1-`, `1.5-` … `1.9.2-`) before the workloads (`2-` through `5-`).
-
-#### Verification (Both Methods)
+### Verification
 
 **Verify deployment**:
 ```bash
