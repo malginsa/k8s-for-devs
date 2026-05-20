@@ -60,3 +60,25 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Current deployment date label
+*/}}
+{{- define "k8s-helm-chart.deploymentDate" -}}
+{{- now | date "2006-01-02" }}
+{{- end }}
+
+{{/*
+Chart version label
+*/}}
+{{- define "k8s-helm-chart.version" -}}
+{{- .Chart.Version }}
+{{- end }}
+
+{{/*
+Custom labels for ConfigMaps
+*/}}
+{{- define "k8s-helm-chart.configMapLabels" -}}
+deployment-date: {{ include "k8s-helm-chart.deploymentDate" . | quote }}
+version: {{ include "k8s-helm-chart.version" . | quote }}
+{{- end }}

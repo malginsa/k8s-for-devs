@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: resources-db-init-sql
   namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "k8s-helm-chart.configMapLabels" . | nindent 4 }}
 data:
   init.sql: |
     -- Resources Database Initialization Script

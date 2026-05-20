@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: songs-ms-config
   namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "k8s-helm-chart.configMapLabels" . | nindent 4 }}
 data:
   SONGS_DB_URL: "songs-db"
   SONGS_DB_PORT: "5432"
