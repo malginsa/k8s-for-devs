@@ -31,24 +31,42 @@ spec:
     spec:
       containers:
         - name: resources-ms
-          image: resources-image:v2
+          image: resources-image:v3
           imagePullPolicy: IfNotPresent # to look the image at the local Docker daemon
           ports:
             - containerPort: 8080 # the port of the app that is running in the container
+          envFrom:
+            - configMapRef:
+                name: resources-ms-config
           env:
-            - name: RESOURCES_DB_URL
-              value: "resources-db" # Points to the ClusterIP service
-            - name: RESOURCES_DB_PORT
-              value: "5432"
             - name: SPRING_DATASOURCE_USERNAME
-              value: "postgres"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-username
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "password"
-            - name: SONGS_MS_URL
-              value: "songs-ms"
-            - name: SONGS_MS_PORT
-              value: "8081"
-            - name: RESOURCES_MS_PORT
-              value: "8080"
-            - name: DATABASE_NAME
-              value: "resources_db"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3

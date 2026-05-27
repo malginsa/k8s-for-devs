@@ -21,6 +21,11 @@ metadata:
   namespace: k8s-program
 spec:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   selector:
     matchLabels:
       app: songs-ms # the pod name to deploy, that described below
@@ -31,23 +36,45 @@ spec:
     spec:
       containers:
         - name: songs-ms
-          image: songs-image:v2
+          image: songs-image:v4
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081 # the port of the app that is running in the container
+          envFrom:
+            - configMapRef:
+                name: songs-ms-config
           env:
-            - name: SONGS_DB_URL
-              value: "songs-db" # Points to the ClusterIP service
-            - name: SONGS_DB_PORT
-              value: "5432"
             - name: SPRING_DATASOURCE_USERNAME
-              value: "postgres"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-username
             - name: SPRING_DATASOURCE_PASSWORD
-              value: "password"
-            - name: SONGS_MS_PORT
-              value: "8081"
-            - name: DATABASE_NAME
-              value: "songs_db"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: postgres-password
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8081
+            failureThreshold: 30
+            periodSeconds: 5
+            timeoutSeconds: 2
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
           volumeMounts:
             - name: songs-local-storage
               mountPath: /app/data # Directory inside PV?

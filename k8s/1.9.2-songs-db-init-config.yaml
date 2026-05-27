@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: songs-db-init-sql
+  namespace: k8s-program
+data:
+  init.sql: |
+    -- Songs Database Initialization Script
+    -- Table: songs
+    -- Stores MP3 metadata (title, artist, album, etc.)
+
+    CREATE TABLE IF NOT EXISTS songs (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        artist VARCHAR(255),
+        album VARCHAR(255),
+        length VARCHAR(50),
+        resource_id INTEGER UNIQUE NOT NULL,
+        year VARCHAR(10),
+        genre VARCHAR(255)
+    );
+
+    -- Indexes for common queries
+    CREATE INDEX IF NOT EXISTS idx_songs_resource_id ON songs(resource_id);
+    CREATE INDEX IF NOT EXISTS idx_songs_artist ON songs(artist);
+    CREATE INDEX IF NOT EXISTS idx_songs_album ON songs(album);
+
+    -- Grant permissions
+    GRANT ALL PRIVILEGES ON TABLE songs TO postgres;
+    GRANT USAGE, SELECT ON SEQUENCE songs_id_seq TO postgres;
