@@ -3,7 +3,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: resources-db
-  namespace: k8s-program
+  namespace: {{ .Values.namespace }}
 spec:
   ports:
     - port: 5432
@@ -17,7 +17,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: resources-db
-  namespace: k8s-program
+  namespace: {{ .Values.namespace }}
 spec:
   serviceName: "resources-db"
   replicas: 1

@@ -1,0 +1,7 @@
+# Custom values for testing override functionality
+
+# Deploy to a different namespace
+namespace: k8s-program-custom
+
+# Increase replica count
+replicaCount: 3

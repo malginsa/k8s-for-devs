@@ -2,7 +2,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: resources-ms-config
-  namespace: k8s-program
+  namespace: {{ .Values.namespace }}
+  labels:
+    {{- include "k8s-helm-chart.configMapLabels" . | nindent 4 }}
 data:
   RESOURCES_DB_URL: "resources-db"
   RESOURCES_DB_PORT: "5432"

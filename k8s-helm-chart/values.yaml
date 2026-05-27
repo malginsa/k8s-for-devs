@@ -1,0 +1,7 @@
+# Default values for k8s-helm-chart
+
+# Namespace where all resources will be deployed
+namespace: k8s-program
+
+# Number of replicas for microservices (resources-ms and songs-ms)
+replicaCount: 2

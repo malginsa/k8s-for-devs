@@ -1,5 +1,3 @@
-# k8s-for-devs
-
 replace openjdk with amazoncorretto
 
 gradlew clean build -x test  # rebuild all jars
@@ -10,13 +8,16 @@ docker build -t songs-image:v4 ./songs-service
 docker image ls resources-image:v3
 docker image ls songs-image:v3
 
---- from the folder contains k8s yaml files:
-kubectl apply -f .
-kubectl apply -f 0-namespace.yaml
+# local deploying
+helm install microservices-app k8s-helm-chart
+# all started components
 kubectl get all -n=k8s-program
+# to run smoke test
+py local-deployment-check.py
+# port forwarding for connection to DB from host machine
 kubectl port-forward -n k8s-program pod/resources-db-0 5433:5432
-kubectl port-forward -n k8s-program pod/songs-db-0 5434:5432
-kubectl delete --ignore-not-found=true -f k8s/
+# to stop
+helm uninstall microservices-app
 
 kubectl describe pod resources-db-0 -n k8s-program
 kubectl get storageclass -n k8s-program
@@ -43,8 +44,6 @@ kubectl exec songs-ms-78b67c5844-4wskb -n k8s-program -- cat /app/data/test.txt
 kubectl delete pod songs-ms-78b67c5844-4wskb -n k8s-program
 kubectl get pods -n k8s-program
 kubectl exec songs-ms-78b67c5844-lfb89 -n k8s-program -- cat /app/data/test.txt
-
-kubectl apply --dry-run (best for K8s validation)
 
 # Validate YAML syntax
 kubectl apply --dry-run=client -f k8s/
