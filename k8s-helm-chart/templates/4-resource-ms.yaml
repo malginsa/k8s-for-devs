@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: resources-ms
-          image: resources-image:v3
+          image: resources-image:v5
           imagePullPolicy: IfNotPresent # to look the image at the local Docker daemon
           ports:
             - containerPort: 8080 # the port of the app that is running in the container
@@ -55,18 +55,20 @@ spec:
               port: 8080
             failureThreshold: 30
             periodSeconds: 5
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8080
+            initialDelaySeconds: 10
             periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 3
+            timeoutSeconds: 5
+            failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8080
+            initialDelaySeconds: 5
             periodSeconds: 5
-            timeoutSeconds: 2
+            timeoutSeconds: 5
             failureThreshold: 3

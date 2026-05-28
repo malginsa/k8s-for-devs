@@ -3,10 +3,10 @@ replace openjdk with amazoncorretto
 gradlew clean build -x test  # rebuild all jars
 gradlew :resources-service:build
 gradlew :songs-service:build
-docker build -t resources-image:v4 ./resources-service
-docker build -t songs-image:v4 ./songs-service
-docker image ls resources-image:v3
-docker image ls songs-image:v3
+docker build -t resources-image:v5 ./resources-service
+docker build -t songs-image:v5 ./songs-service
+docker image ls resources-image:v5
+docker image ls songs-image:v5
 
 # local deploying
 helm install microservices-app k8s-helm-chart

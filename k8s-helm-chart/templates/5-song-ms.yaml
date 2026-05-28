@@ -36,7 +36,7 @@ spec:
     spec:
       containers:
         - name: songs-ms
-          image: songs-image:v4
+          image: songs-image:v5
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8081 # the port of the app that is running in the container
@@ -60,20 +60,22 @@ spec:
               port: 8081
             failureThreshold: 30
             periodSeconds: 5
-            timeoutSeconds: 2
+            timeoutSeconds: 5
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
               port: 8081
+            initialDelaySeconds: 10
             periodSeconds: 10
-            timeoutSeconds: 2
-            failureThreshold: 3
+            timeoutSeconds: 5
+            failureThreshold: 6
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
               port: 8081
+            initialDelaySeconds: 10
             periodSeconds: 5
-            timeoutSeconds: 2
+            timeoutSeconds: 5
             failureThreshold: 3
           volumeMounts:
             - name: songs-local-storage
