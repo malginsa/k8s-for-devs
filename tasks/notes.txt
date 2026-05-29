@@ -57,3 +57,15 @@ kubectl create secret generic test-secret --from-literal=key=value --dry-run=cli
 
 --- to run bash
 wsl -d Ubuntu
+
+--- helm
+helm lint k8s-helm-chart\
+helm template k8s-helm-chart\ --dry-run
+helm template test-release k8s-helm-chart\
+
+helm install microservices-app k8s-helm-chart\ -f k8s-helm-chart\values-dev.yaml --create-namespace -n k8s-program-dev
+kubectl get all -n=k8s-program
+py local-deployment-check.py
+helm list -A
+helm uninstall microservices-app -n k8s-program-dev
+

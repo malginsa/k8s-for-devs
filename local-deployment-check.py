@@ -15,7 +15,7 @@ import urllib.error
 RESOURCE_SERVICE_URL = "http://localhost:30080/resources"
 SONG_SERVICE_URL = "http://localhost:30081/songs"
 TEST_MP3_FILE = "test.mp3"
-NAMESPACE = "k8s-program"
+NAMESPACE = "k8s-program-dev"
 POD_READINESS_TIMEOUT = 30
 POD_READINESS_DELAY = 3
 

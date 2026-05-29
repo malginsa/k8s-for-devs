@@ -1,26 +1,28 @@
+{{- $db := .Values.databases.songsDb -}}
+{{- if $db.enabled }}
 # Songs Database Service
 apiVersion: v1
 kind: Service
 metadata:
   name: songs-db
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
   ports:
-    - port: 5432
-      targetPort: 5432
+    - port: {{ $db.service.port }}
+      targetPort: {{ $db.service.port }}
   selector:
     app: songs-db
-  type: ClusterIP
+  type: {{ $db.service.type }}
 ---
 # Songs Database StatefulSet
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: songs-db
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
   serviceName: "songs-db"
-  replicas: 1
+  replicas: {{ $db.replicas }}
   selector:
     matchLabels:
       app: songs-db
@@ -31,9 +33,16 @@ spec:
     spec:
       containers:
         - name: postgres
-          image: postgres:latest
+          image: "{{ $db.image.repository }}:{{ $db.image.tag }}"
+          imagePullPolicy: {{ $db.image.pullPolicy }}
           ports:
-            - containerPort: 5432
+            - containerPort: {{ $db.service.port }}
+
+          {{- if $db.resources }}
+          resources:
+            {{- toYaml $db.resources | nindent 12 }}
+          {{- end }}
+
           env:
             - name: POSTGRES_DB
               valueFrom:
@@ -50,53 +59,52 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: postgres-password
+
           volumeMounts:
             - name: db-data
               mountPath: /var/lib/postgresql
             - name: init-script
               mountPath: /docker-entrypoint-initdb.d
               readOnly: true
+
           startupProbe:
             tcpSocket:
-              port: 5432
-            failureThreshold: 30
-            periodSeconds: 5
-            timeoutSeconds: 2
+              port: {{ $db.probes.startup.tcpSocket.port }}
+            failureThreshold: {{ $db.probes.startup.failureThreshold }}
+            periodSeconds: {{ $db.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ $db.probes.startup.timeoutSeconds }}
+
           livenessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - postgres
-                - -d
-                - songs_db
-                - -h
-                - 127.0.0.1
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 3
+                {{- toYaml $db.probes.liveness.exec.command | nindent 16 }}
+            periodSeconds: {{ $db.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ $db.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ $db.probes.liveness.failureThreshold }}
+
           readinessProbe:
             exec:
               command:
-                - pg_isready
-                - -U
-                - postgres
-                - -d
-                - songs_db
-                - -h
-                - 127.0.0.1
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 3
+                {{- toYaml $db.probes.readiness.exec.command | nindent 16 }}
+            periodSeconds: {{ $db.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ $db.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ $db.probes.readiness.failureThreshold }}
+
       volumes:
         - name: init-script
           configMap:
             name: songs-db-init-sql
+
   volumeClaimTemplates:
     - metadata:
         name: db-data
       spec:
-        accessModes: [ "ReadWriteOnce" ]
+        accessModes:
+          {{- toYaml $db.storage.accessModes | nindent 10 }}
+        {{- if $db.storage.storageClass }}
+        storageClassName: {{ $db.storage.storageClass }}
+        {{- end }}
         resources:
           requests:
-            storage: 1Gi
+            storage: {{ $db.storage.size }}
+{{- end }}

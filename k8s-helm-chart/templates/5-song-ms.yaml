@@ -1,26 +1,30 @@
+{{- $ms := .Values.microservices.songsMs -}}
+{{- if $ms.enabled }}
 # Songs Microservice Service
 apiVersion: v1
 kind: Service
 metadata:
   name: songs-ms
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
-  type: NodePort # external traffic has access to 8081 on each worker node
+  type: {{ $ms.service.type }}
   ports:
-    - port: 8081 # the "outside" port for incoming requests, mapped to the targetPort of pod
-      targetPort: 8081 # the port ot apps container is listening at (matches containerPort in Deployment)
-      nodePort: 30081 # node port is accessible through it (any of 30000-32767)
+    - port: {{ $ms.service.port }}
+      targetPort: {{ $ms.service.targetPort }}
+      {{- if eq $ms.service.type "NodePort" }}
+      nodePort: {{ $ms.service.nodePort }}
+      {{- end }}
   selector:
-    app: songs-ms # this service is running only for this pod name
+    app: songs-ms
 ---
 # Songs Microservice Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: songs-ms
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ $ms.replicaCount }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -28,18 +32,24 @@ spec:
       maxSurge: 1
   selector:
     matchLabels:
-      app: songs-ms # the pod name to deploy, that described below
-  template: # pod configuration inside deployment
+      app: songs-ms
+  template:
     metadata:
       labels:
-        app: songs-ms # name of the pod
+        app: songs-ms
     spec:
       containers:
         - name: songs-ms
-          image: songs-image:v5
-          imagePullPolicy: IfNotPresent
+          image: "{{ $ms.image.repository }}:{{ $ms.image.tag }}"
+          imagePullPolicy: {{ $ms.image.pullPolicy }}
           ports:
-            - containerPort: 8081 # the port of the app that is running in the container
+            - containerPort: {{ $ms.service.targetPort }}
+
+          {{- if $ms.resources }}
+          resources:
+            {{- toYaml $ms.resources | nindent 12 }}
+          {{- end }}
+
           envFrom:
             - configMapRef:
                 name: songs-ms-config
@@ -54,33 +64,39 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: postgres-password
+            {{- if $ms.env }}
+            {{- toYaml $ms.env | nindent 12 }}
+            {{- end }}
+
+          {{- if $ms.probes.startup.enabled }}
           startupProbe:
             httpGet:
-              path: /actuator/health
-              port: 8081
-            failureThreshold: 30
-            periodSeconds: 5
-            timeoutSeconds: 5
+              path: {{ $ms.probes.startup.httpGet.path }}
+              port: {{ $ms.probes.startup.httpGet.port }}
+            failureThreshold: {{ $ms.probes.startup.failureThreshold }}
+            periodSeconds: {{ $ms.probes.startup.periodSeconds }}
+            timeoutSeconds: {{ $ms.probes.startup.timeoutSeconds }}
+          {{- end }}
+
+          {{- if $ms.probes.liveness.enabled }}
           livenessProbe:
             httpGet:
-              path: /actuator/health/liveness
-              port: 8081
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            timeoutSeconds: 5
-            failureThreshold: 6
+              path: {{ $ms.probes.liveness.httpGet.path }}
+              port: {{ $ms.probes.liveness.httpGet.port }}
+            initialDelaySeconds: {{ $ms.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ $ms.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ $ms.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ $ms.probes.liveness.failureThreshold }}
+          {{- end }}
+
+          {{- if $ms.probes.readiness.enabled }}
           readinessProbe:
             httpGet:
-              path: /actuator/health/readiness
-              port: 8081
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            timeoutSeconds: 5
-            failureThreshold: 3
-          volumeMounts:
-            - name: songs-local-storage
-              mountPath: /app/data # Directory inside PV?
-      volumes:
-        - name: songs-local-storage
-          persistentVolumeClaim:
-            claimName: songs-app-pvc
+              path: {{ $ms.probes.readiness.httpGet.path }}
+              port: {{ $ms.probes.readiness.httpGet.port }}
+            initialDelaySeconds: {{ $ms.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ $ms.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ $ms.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ $ms.probes.readiness.failureThreshold }}
+          {{- end }}
+{{- end }}
