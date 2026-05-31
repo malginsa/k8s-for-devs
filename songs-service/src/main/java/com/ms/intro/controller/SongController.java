@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping(path = "/songs")
+@RequestMapping(path = "/api/v1")
 @AllArgsConstructor
 public class SongController {
 

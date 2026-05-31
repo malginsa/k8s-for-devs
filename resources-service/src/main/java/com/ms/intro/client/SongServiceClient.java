@@ -20,10 +20,10 @@ import java.util.List;
 )
 public interface SongServiceClient {
 
-    @PostMapping("/songs")
+    @PostMapping("/api/v1")
     ResponseEntity<SongDataUploadedResponse> saveSongMetadata(@RequestBody SongDataDto songMetadataDto);
 
-    @DeleteMapping("/songs/by-resource-id")
+    @DeleteMapping("/api/v1/by-resource-id")
     ResponseEntity<SongDataDeletedResponse> deleteSongsMetadata(@RequestParam List<Integer> ids);
 
 }

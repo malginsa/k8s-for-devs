@@ -64,8 +64,22 @@ helm template k8s-helm-chart\ --dry-run
 helm template test-release k8s-helm-chart\
 
 helm install microservices-app k8s-helm-chart\ -f k8s-helm-chart\values-dev.yaml --create-namespace -n k8s-program-dev
-kubectl get all -n=k8s-program
+kubectl get all -n=k8s-program-dev
+kubectl get ingress -n k8s-program-dev
 py local-deployment-check.py
 helm list -A
+   # to apply changes
+helm upgrade microservices-app k8s-helm-chart -n k8s-program-dev
 helm uninstall microservices-app -n k8s-program-dev
+
+=== ingress
+--- to install:
+helm install ingress-nginx ingress-nginx/ingress-nginx --namespace k8s-program-dev --set controller.service.type=LoadBalancer --create-namespace
+kubectl get service --namespace k8s-program-dev ingress-nginx-controller
+--- workaround for Rancher:
+kubectl port-forward -n k8s-program-dev svc/ingress-nginx-controller 8080:80
+kubectl port-forward -n k8s-program-dev svc/ingress-nginx-controller 8081:81
+--- to verify the installation:
+kubectl get service --namespace k8s-program-dev ingress-nginx-controller --output wide --watch
+kubectl get pods -n k8s-program-dev -l app.kubernetes.io/name=ingress-nginx
 
