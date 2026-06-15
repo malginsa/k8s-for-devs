@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: microservices-ingress
+  namespace: {{ .Values.global.namespace }}
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /api/v1/$2
+spec:
+  rules:
+    - http:
+        paths:
+          # Matches: /api/v1/resources/<anything>  Rewrites to: /api/v1/<anything>
+          - path: /api/v1/resources(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: resources-ms
+                port:
+                  number: 8080
+          # Matches: /api/v1/songs/<anything>  Rewrites to: /api/v1/<anything>
+          - path: /api/v1/songs(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: songs-ms
+                port:
+                  number: 8081

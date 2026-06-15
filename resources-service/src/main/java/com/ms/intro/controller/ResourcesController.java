@@ -29,7 +29,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @RestController
-@RequestMapping(path = "/resources")
+@RequestMapping(path = "/api/v1")
 @AllArgsConstructor
 public class ResourcesController  {
 
