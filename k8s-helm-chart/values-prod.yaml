@@ -1,0 +1,66 @@
+# Production environment values
+
+global:
+  namespace: k8s-program-prod
+
+microservices:
+  resourcesMs:
+    replicaCount: 3
+    image:
+      tag: v5
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+    probes:
+      startup:
+        failureThreshold: 60  # More time for production startup
+      liveness:
+        periodSeconds: 30
+      readiness:
+        periodSeconds: 10
+
+  songsMs:
+    replicaCount: 3
+    image:
+      tag: v5
+    resources:
+      requests:
+        cpu: "500m"
+        memory: "1Gi"
+      limits:
+        cpu: "2000m"
+        memory: "2Gi"
+    probes:
+      startup:
+        failureThreshold: 60
+      liveness:
+        periodSeconds: 30
+      readiness:
+        periodSeconds: 10
+
+databases:
+  resourcesDb:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+    storage:
+      size: 10Gi
+
+  songsDb:
+    resources:
+      requests:
+        cpu: "250m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+    storage:
+      size: 10Gi

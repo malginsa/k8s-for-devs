@@ -7,7 +7,7 @@ spec:
     storage: 2Gi
   volumeMode: Filesystem
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: manual
   hostPath:
@@ -17,10 +17,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: songs-app-pvc
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.global.namespace }}
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Gi

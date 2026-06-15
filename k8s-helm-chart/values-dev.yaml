@@ -1,0 +1,52 @@
+# Development environment values
+
+global:
+  namespace: k8s-program-dev
+
+microservices:
+  resourcesMs:
+    replicaCount: 2
+    image:
+      tag: v5
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+  songsMs:
+    replicaCount: 2
+    image:
+      tag: v5
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+databases:
+  resourcesDb:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+    storage:
+      size: 500Mi
+
+  songsDb:
+    resources:
+      requests:
+        cpu: "50m"
+        memory: "128Mi"
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+    storage:
+      size: 500Mi

@@ -1,7 +1,279 @@
 # Default values for k8s-helm-chart
 
-# Namespace where all resources will be deployed
-namespace: k8s-program
+# Global settings
+global:
+  namespace: k8s-program
 
-# Number of replicas for microservices (resources-ms and songs-ms)
-replicaCount: 2
+  # Global defaults (can be overridden per service)
+  defaultResources:
+    requests:
+      cpu: "100m"
+      memory: "256Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  defaultProbes:
+    startup:
+      failureThreshold: 30
+      periodSeconds: 5
+      timeoutSeconds: 5
+    liveness:
+      initialDelaySeconds: 10
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 6
+    readiness:
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
+      failureThreshold: 3
+
+# Microservices configuration
+microservices:
+  resourcesMs:
+    enabled: true
+    replicaCount: 2
+
+    image:
+      repository: resources-image
+      tag: v5
+      pullPolicy: IfNotPresent
+
+    service:
+      type: NodePort
+      port: 8080
+      targetPort: 8080
+      nodePort: 30080
+
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
+    probes:
+      startup:
+        enabled: true
+        httpGet:
+          path: /actuator/health
+          port: 8080
+        failureThreshold: 30
+        periodSeconds: 5
+        timeoutSeconds: 5
+
+      liveness:
+        enabled: true
+        httpGet:
+          path: /actuator/health/liveness
+          port: 8080
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 6
+
+      readiness:
+        enabled: true
+        httpGet:
+          path: /actuator/health/readiness
+          port: 8080
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+    env: []
+      # Additional environment variables can be added here
+      # Example:
+      # - name: CUSTOM_VAR
+      #   value: "custom-value"
+
+  songsMs:
+    enabled: true
+    replicaCount: 2
+
+    image:
+      repository: songs-image
+      tag: v5
+      pullPolicy: IfNotPresent
+
+    service:
+      type: NodePort
+      port: 8081
+      targetPort: 8081
+      nodePort: 30081
+
+    resources:
+      requests:
+        cpu: "200m"
+        memory: "512Mi"
+      limits:
+        cpu: "1000m"
+        memory: "1Gi"
+
+    probes:
+      startup:
+        enabled: true
+        httpGet:
+          path: /actuator/health
+          port: 8081
+        failureThreshold: 30
+        periodSeconds: 5
+        timeoutSeconds: 5
+
+      liveness:
+        enabled: true
+        httpGet:
+          path: /actuator/health/liveness
+          port: 8081
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 6
+
+      readiness:
+        enabled: true
+        httpGet:
+          path: /actuator/health/readiness
+          port: 8081
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+    env: []
+
+# Database configuration
+databases:
+  resourcesDb:
+    enabled: true
+    replicas: 1
+
+    image:
+      repository: postgres
+      tag: "16-alpine"  # Use specific version instead of 'latest'
+      pullPolicy: IfNotPresent
+
+    service:
+      type: ClusterIP
+      port: 5432
+
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+    storage:
+      size: 1Gi
+      storageClass: ""  # Use default storage class
+      accessModes:
+        - ReadWriteOnce
+
+    probes:
+      startup:
+        tcpSocket:
+          port: 5432
+        failureThreshold: 30
+        periodSeconds: 5
+        timeoutSeconds: 2
+
+      liveness:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - resources_db
+            - -h
+            - 127.0.0.1
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+      readiness:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - resources_db
+            - -h
+            - 127.0.0.1
+        periodSeconds: 5
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+  songsDb:
+    enabled: true
+    replicas: 1
+
+    image:
+      repository: postgres
+      tag: "16-alpine"
+      pullPolicy: IfNotPresent
+
+    service:
+      type: ClusterIP
+      port: 5432
+
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
+
+    storage:
+      size: 1Gi
+      storageClass: ""
+      accessModes:
+        - ReadWriteOnce  # Fixed from ReadWriteMany
+
+    probes:
+      startup:
+        tcpSocket:
+          port: 5432
+        failureThreshold: 30
+        periodSeconds: 5
+        timeoutSeconds: 2
+
+      liveness:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - songs_db
+            - -h
+            - 127.0.0.1
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+      readiness:
+        exec:
+          command:
+            - pg_isready
+            - -U
+            - postgres
+            - -d
+            - songs_db
+            - -h
+            - 127.0.0.1
+        periodSeconds: 5
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+# Backward compatibility (deprecated)
+# These values are kept for backward compatibility but should not be used
+namespace: k8s-program  # Use global.namespace instead
+replicaCount: 2          # Use microservices.*.replicaCount instead

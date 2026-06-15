@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: resources-ms-config
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Values.global.namespace }}
   labels:
     {{- include "k8s-helm-chart.configMapLabels" . | nindent 4 }}
 data:
